@@ -1,5 +1,5 @@
 import Image from "next/image";
-import Input from "./components/Input";
+import Input from "../components/Input";
 import logo from "@/public/logo.jpg";
 
 export default function Home() {
