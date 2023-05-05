@@ -7,6 +7,7 @@ import { RiLoader4Fill } from "react-icons/ri";
 export default function Input() {
   const [youTubeUrl, setYouTubeUrl] = useState("");
   const [loading, setLoading] = useState(false);
+
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     setLoading(true);
     event.preventDefault();
