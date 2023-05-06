@@ -20,7 +20,11 @@ export default function Input() {
 
     let fileName = "audio";
     try {
-      const data = await fetch("https://ytdl-oak.deno.dev/download", options);
+      const data = await fetch(
+        "https://ytdl-oak.deno.dev/v2/download",
+        // "http://localhost:8080/v2/download",
+        options
+      );
       if (!data.ok) {
         throw new Error(await data.json());
       }
@@ -35,7 +39,8 @@ export default function Input() {
       if (contentDisposition) {
         fileName = decodeURI(contentDisposition);
       }
-      const newBlob = new Blob([blob]);
+      const newBlob = new Blob([blob], { type: "audio/mpeg" });
+
       const blobUrl = window.URL.createObjectURL(newBlob);
 
       const link = document.createElement("a");
@@ -52,7 +57,8 @@ export default function Input() {
     } catch (error: any) {
       setYouTubeUrl("");
       setLoading(false);
-      toast.error("Please enter a valid YouTube URL.");
+      // toast.error("Please enter a valid YouTube URL.");
+      toast.error(error.message);
     }
   };
 
