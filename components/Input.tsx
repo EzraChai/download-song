@@ -76,8 +76,12 @@ export default function Input() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-      <div className="flex flex-col ">
+    <form
+      onSubmit={handleSubmit}
+      className="flex flex-col gap-4"
+      aria-label="YouTube video to MP3 converter form"
+    >
+      <div className="flex flex-col">
         <label htmlFor="urlInput" className="mb-1 text-base font-semibold">
           YouTube URL <span className="text-red-500">*</span>
         </label>
@@ -100,6 +104,7 @@ export default function Input() {
         disabled={loading || !youTubeUrl}
         className="px-2 py-2 mt-2 font-semibold text-black transition bg-white border rounded-lg hover:bg-black hover:text-white disabled:bg-neutral-800 disabled:text-neutral-400 disabled:border-[#333]"
         type="submit"
+        aria-label="Download MP3 button"
       >
         {loading ? (
           <div className="flex items-center justify-center gap-1">

@@ -9,8 +9,9 @@ export default function Home() {
         <div className="grid grid-cols-7 gap-4 mb-6">
           <Image
             src={logo}
-            alt="logo"
+            alt="TubeToMP3 logo"
             className="col-span-2 bg-white md:col-span-1"
+            aria-label="TubeToMP3 logo"
           />
           <div className="self-center col-span-5 px-4 md:col-span-6">
             <h2 className="text-xl font-bold md:text-3xl ">TubeToMP3</h2>
