@@ -18,48 +18,61 @@ export default function Input() {
       body: JSON.stringify({ url: youTubeUrl }),
     };
 
-    let fileName = "audio";
-    try {
-      const data = await fetch(
-        "https://ytdl-oak.deno.dev/v2/download",
-        // "http://localhost:8080/v2/download",
-        options
-      );
-      if (!data.ok) {
-        throw new Error(await data.json());
-      }
-      const blob = await data.blob();
-      const contentDisposition = await data.headers
-        .get("Content-Disposition")
-        ?.split(";")[1]
-        .trim()
-        .split("=")[1]
-        .replaceAll('"', "")
-        .replace(".mp3", "");
-      if (contentDisposition) {
-        fileName = decodeURI(contentDisposition);
-      }
-      const newBlob = new Blob([blob], { type: "audio/mpeg" });
+    let fileName = "";
 
-      const blobUrl = window.URL.createObjectURL(newBlob);
+    fetch("https://ytdl-oak.deno.dev/v2/download", options)
+      .then((response) => {
+        const reader = response.body?.getReader();
+        const contentDisposition = response.headers
+          .get("Content-Disposition")
+          ?.split(";")[1]
+          .trim()
+          .split("=")[1]
+          .replaceAll('"', "");
+        if (contentDisposition) {
+          fileName = decodeURI(contentDisposition);
+          console.log(fileName);
+        }
+        return new ReadableStream({
+          start(controller) {
+            return pump();
+            function pump(): any {
+              if (reader)
+                return reader.read().then(({ done, value }) => {
+                  if (done) {
+                    controller.close();
+                    return;
+                  }
+                  controller.enqueue(value);
+                  return pump();
+                });
+            }
+          },
+        });
+      })
+      .then((stream) => new Response(stream))
+      .then((response) => response.blob())
+      .then(async (blob) => {
+        const newBlob = new Blob([blob], { type: "audio/mpeg" });
 
-      const link = document.createElement("a");
-      link.href = blobUrl;
-      link.setAttribute("download", `${fileName}.mp3`);
-      document.body.appendChild(link);
-      link.click();
-      link.parentNode?.removeChild(link);
-
-      // clean up Url
-      window.URL.revokeObjectURL(blobUrl);
-      setYouTubeUrl("");
-      setLoading(false);
-    } catch (error: any) {
-      setYouTubeUrl("");
-      setLoading(false);
-      // toast.error("Please enter a valid YouTube URL.");
-      toast.error(error.message);
-    }
+        const blobUrl = window.URL.createObjectURL(newBlob);
+        const link = document.createElement("a");
+        link.href = blobUrl;
+        link.setAttribute("download", fileName);
+        document.body.appendChild(link);
+        link.click();
+        link.parentNode?.removeChild(link);
+        window.URL.revokeObjectURL(blobUrl);
+        link.remove(); // if you have access to writer
+        setYouTubeUrl("");
+        setLoading(false);
+      })
+      .catch((error) => {
+        setYouTubeUrl("");
+        setLoading(false);
+        // toast.error("Please enter a valid YouTube URL.");
+        toast.error(error.message);
+      });
   };
 
   return (
