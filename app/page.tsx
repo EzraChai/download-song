@@ -4,13 +4,17 @@ import logo from "@/public/logo.jpg";
 
 export default function Home() {
   return (
-    <main className="flex flex-col items-center justify-center min-h-screen p-24 text-white">
-      <div className="max-w-2xl p-8 bg-black border border-[#333] rounded-lg">
+    <main className="flex flex-col items-center justify-center min-h-screen p-4 text-white md:p-24">
+      <div className="max-w-2xl p-4 md:p-8 bg-black border border-[#333] rounded-lg">
         <div className="grid grid-cols-7 gap-4 mb-6">
-          <Image src={logo} alt="logo" className="col-span-1 bg-white" />
-          <div className="self-center col-span-6 px-4">
-            <h2 className="text-3xl font-bold ">TubeToMP3</h2>
-            <p className="text-base text-neutral-400">
+          <Image
+            src={logo}
+            alt="logo"
+            className="col-span-2 bg-white md:col-span-1"
+          />
+          <div className="self-center col-span-5 px-4 md:col-span-6">
+            <h2 className="text-xl font-bold md:text-3xl ">TubeToMP3</h2>
+            <p className="text-sm md:text-base text-neutral-400">
               Convert YouTube videos to MP3 easily.
             </p>
           </div>
