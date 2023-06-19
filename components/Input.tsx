@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { useState } from "react";
 import { toast } from "react-hot-toast";
 import { RiLoader4Fill } from "react-icons/ri";
 
@@ -8,76 +8,77 @@ export default function Input() {
   const [youTubeUrl, setYouTubeUrl] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    setLoading(true);
-    event.preventDefault();
+  // const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+  //   setLoading(true);
+  //   event.preventDefault();
 
-    const options = {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ url: youTubeUrl }),
-    };
+  //   const options = {
+  //     method: "POST",
+  //     headers: { "content-type": "application/json" },
+  //     body: JSON.stringify({ url: youTubeUrl }),
+  //   };
 
-    let fileName = "";
+  //   fetch(`http://localhost:8080/v3/download?url=${youTubeUrl}`);
 
-    fetch("https://ytdl-oak.deno.dev/v2/download", options)
-      .then((response) => {
-        const reader = response.body?.getReader();
-        const contentDisposition = response.headers
-          .get("Content-Disposition")
-          ?.split(";")[1]
-          .trim()
-          .split("=")[1]
-          .replaceAll('"', "");
-        if (contentDisposition) {
-          fileName = decodeURI(contentDisposition);
-          console.log(fileName);
-        }
-        return new ReadableStream({
-          start(controller) {
-            return pump();
-            function pump(): any {
-              if (reader)
-                return reader.read().then(({ done, value }) => {
-                  if (done) {
-                    controller.close();
-                    return;
-                  }
-                  controller.enqueue(value);
-                  return pump();
-                });
-            }
-          },
-        });
-      })
-      .then((stream) => new Response(stream))
-      .then((response) => response.blob())
-      .then(async (blob) => {
-        const newBlob = new Blob([blob], { type: "audio/mpeg" });
+  //   // let fileName = "";
 
-        const blobUrl = window.URL.createObjectURL(newBlob);
-        const link = document.createElement("a");
-        link.href = blobUrl;
-        link.setAttribute("download", fileName);
-        document.body.appendChild(link);
-        link.click();
-        link.parentNode?.removeChild(link);
-        window.URL.revokeObjectURL(blobUrl);
-        link.remove(); // if you have access to writer
-        setYouTubeUrl("");
-        setLoading(false);
-      })
-      .catch((error) => {
-        setYouTubeUrl("");
-        setLoading(false);
-        // toast.error("Please enter a valid YouTube URL.");
-        toast.error(error.message);
-      });
-  };
+  //   // fetch("https://ytdl-oak.deno.dev/v2/download", options)
+  //   //   .then((response) => {
+  //   //     const reader = response.body?.getReader();
+  //   //     const contentDisposition = response.headers
+  //   //       .get("Content-Disposition")
+  //   //       ?.split(";")[1]
+  //   //       .trim()
+  //   //       .split("=")[1]
+  //   //       .replaceAll('"', "");
+  //   //     if (contentDisposition) {
+  //   //       fileName = decodeURI(contentDisposition);
+  //   //       console.log(fileName);
+  //   //     }
+  //   //     return new ReadableStream({
+  //   //       start(controller) {
+  //   //         return pump();
+  //   //         function pump(): any {
+  //   //           if (reader)
+  //   //             return reader.read().then(({ done, value }) => {
+  //   //               if (done) {
+  //   //                 controller.close();
+  //   //                 return;
+  //   //               }
+  //   //               controller.enqueue(value);
+  //   //               return pump();
+  //   //             });
+  //   //         }
+  //   //       },
+  //   //     });
+  //   //   })
+  //   //   .then((stream) => new Response(stream))
+  //   //   .then((response) => response.blob())
+  //   //   .then(async (blob) => {
+  //   //     const newBlob = new Blob([blob], { type: "audio/mpeg" });
+
+  //   //     const blobUrl = window.URL.createObjectURL(newBlob);
+  //   //     const link = document.createElement("a");
+  //   //     link.href = blobUrl;
+  //   //     link.setAttribute("download", fileName);
+  //   //     document.body.appendChild(link);
+  //   //     link.click();
+  //   //     link.parentNode?.removeChild(link);
+  //   //     window.URL.revokeObjectURL(blobUrl);
+  //   //     link.remove(); // if you have access to writer
+  //   //     setYouTubeUrl("");
+  //   //     setLoading(false);
+  //   //   })
+  //   //   .catch((error) => {
+  //   //     setYouTubeUrl("");
+  //   //     setLoading(false);
+  //   //     // toast.error("Please enter a valid YouTube URL.");
+  //   //     toast.error(error.message);
+  //   //   });
+  // };
 
   return (
-    <form
-      onSubmit={handleSubmit}
+    <div
       className="flex flex-col gap-4"
       aria-label="YouTube video to MP3 converter form"
     >
@@ -101,9 +102,17 @@ export default function Input() {
       </div>
 
       <button
-        disabled={loading || !youTubeUrl}
+        onClick={() => {
+          try {
+            window.location.href = `${process.env.NEXT_PUBLIC_DOWNLOAD_SONG_BACKEND_URL}?url=${youTubeUrl}`;
+            setYouTubeUrl("");
+          } catch (error) {
+            setYouTubeUrl("");
+            toast.error("Please enter a valid YouTube URL.");
+          }
+        }}
+        disabled={!!loading || youTubeUrl.trim().length === 0}
         className="px-2 py-2 mt-2 font-semibold text-black transition bg-white border rounded-lg hover:bg-black hover:text-white disabled:bg-neutral-800 disabled:text-neutral-400 disabled:border-[#333]"
-        type="submit"
         aria-label="Download MP3 button"
       >
         {loading ? (
@@ -115,6 +124,6 @@ export default function Input() {
           <>Download MP3</>
         )}
       </button>
-    </form>
+    </div>
   );
 }
