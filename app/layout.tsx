@@ -6,7 +6,7 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
   title: "TubeToMP3",
-  description: "Convert YouTube videos to MP3 easily",
+  description: "Convert YouTube videos to MP3 with album art.",
 };
 
 export default function RootLayout({

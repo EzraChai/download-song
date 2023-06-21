@@ -16,7 +16,7 @@ export default function Home() {
           <div className="self-center col-span-5 px-4 md:col-span-6">
             <h2 className="text-xl font-bold md:text-3xl ">TubeToMP3</h2>
             <p className="text-sm md:text-base text-neutral-400">
-              Convert YouTube videos to MP3 easily.
+              Convert YouTube videos to MP3 with album art.
             </p>
           </div>
         </div>
